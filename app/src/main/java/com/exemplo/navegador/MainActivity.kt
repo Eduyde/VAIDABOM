@@ -1,20 +1,34 @@
-val webView = findViewById<WebView>(R.id.webView)
+package com.exemplo.navegador
 
-// 1. Habilita o JavaScript
-webView.settings.jsEnabled = true
+import android.os.Bundle
+import android.webkit.WebResourceRequest
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AppCompatActivity
 
-// 2. Garante que os links abram dentro do WebView
-webView.webViewClient = WebViewClient()
+class MainActivity : AppCompatActivity() {
 
-// 3. Exemplo de tratamento da URL digitada
-var urlDigitada = "facebook.com.br" // Substitua pelo texto que o usuário digitou
+    private lateinit var webView: WebView
 
-if (!urlDigitada.startsWith("http://") && !urlDigitada.startsWith("https://")) {
-    if (urlDigitada.contains(".")) {
-        urlDigitada = "https://$urlDigitada"
-    } else {
-        urlDigitada = "https://www.google.com/search?q=$urlDigitada"
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        webView = findViewById(R.id.webView)
+        webView.settings.javaScriptEnabled = true
+        webView.webViewClient = object : WebViewClient() {
+            override fun shouldOverrideUrlLoading(
+                view: WebView,
+                request: WebResourceRequest
+            ): Boolean = false
+        }
+        webView.loadUrl("https://www.google.com")
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (webView.canGoBack()) webView.goBack() else finish()
+            }
+        })
     }
 }
-
-webView.loadUrl(urlDigitada)
